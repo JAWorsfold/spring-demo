@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -20,6 +21,13 @@ public class StudentService {
     }
 
     public void addNewStudent(Student student) {
-        System.out.println(student);
+        Optional<Student> studentOptional = studentRepository
+                .findStudentByEmail(student.getEmail());
+        // TODO: can do more complex validation like regex for email validation
+        if (studentOptional.isPresent()) {
+            // TODO: better exception handling
+            throw new IllegalStateException("Email Taken");
+        }
+        studentRepository.save(student);
     }
 }
