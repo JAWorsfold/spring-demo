@@ -34,9 +34,27 @@ public class StudentService {
 
     public void deleteStudent(Long studentId) {
         if (!studentRepository.existsById(studentId)) {
-            throw  new IllegalStateException("Student with ID " + studentId + " does not exist.");
+            throw new IllegalStateException("Student with ID " + studentId + " does not exist.");
         }
         studentRepository.deleteById(studentId);
+    }
+
+    @Transactional
+    public void updateStudent(Long studentId, String name, String email) {
+        Student student = studentRepository.findById(studentId).orElseThrow(
+                () -> new IllegalStateException("Student with ID " + studentId + " does not exist.")
+        );
+
+        // TODO: errors for empty strings or just whitespace
+        if (name != null && !name.isEmpty() && !name.isBlank() && !name.equals(student.getName())) {
+            student.setName(name);
+        }
+        if (email != null && !email.isEmpty() && !email.isBlank() && !email.equals(student.getEmail())) {
+            if (studentRepository.findStudentByEmail(email).isPresent()) {
+                throw new IllegalStateException("Email Taken");
+            }
+            student.setEmail(email);
+        }
     }
 
 }
